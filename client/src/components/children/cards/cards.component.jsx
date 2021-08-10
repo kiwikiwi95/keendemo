@@ -6,12 +6,14 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { border } from '@material-ui/system';
-import { useSortedCards, useSortState } from '../../../hooks/cards.hooks';
+import { useSortedCards } from '../../../hooks/cards.hooks';
 import Container from './cards.styles';
 
 const Cards = () => {
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState(() => {
+    console.log('inside useState');
+    return [];
+  });
   const { handleSort } = useSortedCards(cards, setCards, 'config');
   return (
     <Container>

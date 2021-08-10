@@ -4,27 +4,28 @@ import { sort } from './utils';
 
 export const useSortedCards = (cards, setCards, key, defaultConfig = null) => {
   const [sortConfig, setSortConfig] = useState(() => {
+    console.log('inside useState');
     const sortConfig = window.localStorage.getItem(key);
     return sortConfig !== null ? JSON.parse(sortConfig) : defaultConfig;
-  }, []);
+  });
+  const sortCards = async cards => {
+    try {
+      if (cards) {
+        let sortedCards = [...cards];
+        if (sortConfig) sortedCards = sort(sortedCards, sortConfig);
+        setCards(sortedCards);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
+    console.log('inside useEffect');
     window.localStorage.setItem(key, JSON.stringify(sortConfig));
     setSortConfig(sortConfig);
   }, [key, sortConfig]);
-  useMemo(() => {
-    const sortCards = async cards => {
-      try {
-        if (cards) {
-          let sortedCards = [...cards];
-          if (sortConfig) {
-            sortedCards = sort(sortedCards, sortConfig);
-          }
-          setCards(sortedCards);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  useEffect(() => {
+    console.log('inside useEffect');
     const fetchCards = async () => {
       try {
         const options = {
@@ -40,8 +41,11 @@ export const useSortedCards = (cards, setCards, key, defaultConfig = null) => {
       }
     };
     fetchCards();
-  }, [sortConfig]);
-
+  }, []);
+  useEffect(() => {
+    console.log('inside useEffect');
+    sortCards(cards);
+  }, [setCards, sortConfig]);
   const handleSort = term => {
     let direction = 'ascending';
     if (
@@ -53,17 +57,5 @@ export const useSortedCards = (cards, setCards, key, defaultConfig = null) => {
     }
     setSortConfig({ term, direction });
   };
-
   return { handleSort };
-};
-
-export const useSortState = (defaultConfig, key) => {
-  const [config, setConfig] = useState(() => {
-    const sortConfig = window.localStorage.getItem(key);
-    return sortConfig !== null ? JSON.parse(sortConfig) : defaultConfig;
-  });
-  useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(config));
-  }, [key, config]);
-  return [config, setConfig];
 };
